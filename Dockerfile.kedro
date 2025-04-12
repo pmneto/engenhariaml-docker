@@ -1,0 +1,19 @@
+FROM python:3.11-slim-bookworm
+
+WORKDIR /app
+
+# Instala dependências básicas
+RUN apt-get update && apt-get install -y \
+    git build-essential curl libgl1-mesa-glx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clona o código do projeto
+RUN git clone https://github.com/pmneto/pd_engenharia_ml.git .
+
+# Instala dependências Python
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Rodar pipeline ao subir (opcional se for container dedicado ao Kedro)
+CMD ["kedro", "run"]

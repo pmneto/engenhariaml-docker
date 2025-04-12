@@ -1,0 +1,58 @@
+services:
+  kedro_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.kedro
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./data:/app/data
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.kedro  # já que mlflow está no requirements
+    working_dir: /app
+    command: >
+      mlflow server 
+      --host 0.0.0.0 
+      --port 5000 
+      --backend-store-uri /app/mlruns 
+      --default-artifact-root /app/mlruns
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/app/mlruns
+
+  streamlit_serve:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./data:/app/data
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - kedro_app
+      - mlflow
+
+  streamlit_dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    ports:
+      - "8502:8502"
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./data:/app/data
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - kedro_app
+      - mlflow

@@ -1,0 +1,5 @@
+FROM infra-engenhariaml-kedro_app:latest
+
+WORKDIR /app
+
+CMD ["streamlit", "run", "dashboard_monitoramento.py", "--server.port=8502"]

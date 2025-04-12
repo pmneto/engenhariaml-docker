@@ -1,0 +1,5 @@
+FROM infra-engenhariaml-kedro_app:latest
+
+WORKDIR /app
+
+CMD ["streamlit", "run", "serve_model_streamlit.py", "--server.port=8501"]
